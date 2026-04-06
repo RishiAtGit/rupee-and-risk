@@ -28,6 +28,10 @@ app = FastAPI(title="RupeeAndRisk.ai API", lifespan=lifespan)
 app.include_router(auth_router)
 app.include_router(payment_router)
 
+@app.get("/")
+def health_check():
+    return {"status": "alive", "message": "Rupee and Risk API is operational."}
+
 class ChatRequest(BaseModel):
     question: str
 
