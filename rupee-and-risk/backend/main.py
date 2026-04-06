@@ -1,4 +1,6 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, Header
+from contextlib import asynccontextmanager
+import asyncio
 from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import Session, select
 
@@ -16,7 +18,7 @@ from auth import get_pro_user
 load_dotenv()
 client = google_genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
-app = FastAPI(title="RupeeAndRisk.ai API")
+app = FastAPI(title="RupeeAndRisk.ai API", lifespan=lifespan)
 app.include_router(auth_router)
 app.include_router(payment_router)
 
@@ -31,13 +33,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.on_event("startup")
-def on_startup():
-    create_db_and_tables()
-    
-    pass
-
-from fastapi import Header
+@asynccontextmanager
+async def lifespan(application: FastAPI):
+    # Initialize DB in a background thread so uvicorn binds to port immediately
+    asyncio.create_task(asyncio.to_thread(create_db_and_tables))
+    yield
 
 @app.post("/api/scheduler/force-fetch")
 def force_fetch_webhook(webhook_token: str = Header(None)):
