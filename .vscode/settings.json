@@ -1,8 +1,0 @@
-{
-    "python.defaultInterpreterPath": "c:\\rupee\\rupee-and-risk\\backend\\venv\\Scripts\\python.exe",
-    "python.analysis.extraPaths": [
-        "c:\\rupee\\rupee-and-risk\\backend\\venv\\Lib\\site-packages"
-    ],
-    "python.languageServer": "Pylance",
-    "python.analysis.typeCheckingMode": "off"
-}
