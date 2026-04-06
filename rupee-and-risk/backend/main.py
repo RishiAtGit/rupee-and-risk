@@ -6,7 +6,7 @@ from models import create_db_and_tables, engine, EarningsCall, FinancialMetric, 
 from batch_processor import run_daily_fetcher
 from pydantic import BaseModel
 import os
-import google.generativeai as genai
+from google import genai as google_genai
 from dotenv import load_dotenv
 from auth_routes import router as auth_router
 from payment_routes import router as payment_router
@@ -14,7 +14,7 @@ from models import User
 from auth import get_pro_user
 
 load_dotenv()
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+client = google_genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
 app = FastAPI(title="RupeeAndRisk.ai API")
 app.include_router(auth_router)
@@ -186,8 +186,10 @@ Q&A HIGHLIGHTS:
 Answer the user's question clearly, concisely, and professionally. Reference specific data points when available. Be direct and insightful — avoid hedging language.
 """
         try:
-            model = genai.GenerativeModel("gemini-2.5-flash")
-            response = model.generate_content(f"{context}\n\nUSER QUESTION: {body.question}")
+            response = client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=f"{context}\n\nUSER QUESTION: {body.question}"
+            )
             return {"answer": response.text}
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"AI inference error: {str(e)}")
