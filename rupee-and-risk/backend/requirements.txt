@@ -30,9 +30,6 @@ lxml==6.0.2
 # PDF Parsing
 pypdf==6.6.2
 
-# Data Processing
-pandas==2.3.3
-
 # Environment Variables (Secure API key loading)
 python-dotenv==1.2.1
 
