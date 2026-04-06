@@ -18,6 +18,12 @@ from auth import get_pro_user
 load_dotenv()
 client = google_genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
+@asynccontextmanager
+async def lifespan(application: FastAPI):
+    # Initialize DB in a background thread so uvicorn binds to port immediately
+    asyncio.create_task(asyncio.to_thread(create_db_and_tables))
+    yield
+
 app = FastAPI(title="RupeeAndRisk.ai API", lifespan=lifespan)
 app.include_router(auth_router)
 app.include_router(payment_router)
@@ -27,17 +33,16 @@ class ChatRequest(BaseModel):
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:8085", "http://127.0.0.1:8085"], 
+    allow_origins=[
+        "http://localhost:5173", "http://127.0.0.1:5173",
+        "http://localhost:8085", "http://127.0.0.1:8085",
+        "https://rupee-and-risk.onrender.com",
+        "https://*.vercel.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-@asynccontextmanager
-async def lifespan(application: FastAPI):
-    # Initialize DB in a background thread so uvicorn binds to port immediately
-    asyncio.create_task(asyncio.to_thread(create_db_and_tables))
-    yield
 
 @app.post("/api/scheduler/force-fetch")
 def force_fetch_webhook(webhook_token: str = Header(None)):
