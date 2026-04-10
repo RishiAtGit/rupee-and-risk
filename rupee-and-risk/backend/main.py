@@ -41,7 +41,7 @@ app.add_middleware(
         "http://localhost:5173", "http://127.0.0.1:5173",
         "http://localhost:8085", "http://127.0.0.1:8085",
         "https://rupee-and-risk.onrender.com",
-        "https://*.vercel.app",
+        "https://rupee-and-risk.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
