@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends, Header
+from fastapi import FastAPI, HTTPException, Depends, Header, BackgroundTasks
 from contextlib import asynccontextmanager
 import asyncio
 from fastapi.middleware.cors import CORSMiddleware
@@ -49,17 +49,18 @@ app.add_middleware(
 )
 
 @app.post("/api/scheduler/force-fetch")
-def force_fetch_webhook(webhook_token: str = Header(None)):
+def force_fetch_webhook(background_tasks: BackgroundTasks, webhook_token: str = Header(None)):
     expected_token = os.getenv("WEBHOOK_TOKEN")
     if not expected_token or webhook_token != expected_token:
         raise HTTPException(status_code=401, detail="Unauthorized Webhook")
     
-    # Run the fetcher
+    # Run the fetcher in the background to avoid Render hitting its 100-second timeout 
+    # and to respond to cron-job.org instantly
     try:
-        run_daily_fetcher()
-        return {"status": "success", "message": "Batch processor executed successfully via webhook."}
+        background_tasks.add_task(run_daily_fetcher)
+        return {"status": "accepted", "message": "Batch processing started in background."}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Fetcher failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to start fetcher: {str(e)}")
 
 @app.get("/api/companies")
 def get_all_companies(user: User = Depends(get_pro_user)):
