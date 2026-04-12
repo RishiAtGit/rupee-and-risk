@@ -7,7 +7,7 @@ export default function EarningsPage() {
     const [loading, setLoading] = useState(true);
     const [activeQuarter, setActiveQuarter] = useState('Latest Summaries');
     
-    const quarters = ['Latest Summaries', 'Q4 FY25', 'Q1 FY26', 'Q2 FY26', 'Q3 FY26'];
+    const quarters = ['Latest Summaries', 'Q4 FY25', 'Q1 FY26', 'Q2 FY26', 'Q3 FY26', 'Q4 FY26'];
 
     useEffect(() => {
         window.scrollTo(0, 0);
