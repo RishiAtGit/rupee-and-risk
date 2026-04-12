@@ -2,7 +2,10 @@ import React, { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import { AuthContext } from '../context/AuthContext';
-import { Lock, Mail, User, ArrowRight, Activity } from 'lucide-react';
+import { Lock, Mail, User, ArrowRight, Activity, Eye, EyeOff, X, CheckCircle2 } from 'lucide-react';
+import axios from 'axios';
+
+const API = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
 const LoginPage = () => {
   const [isRegistering, setIsRegistering] = useState(false);
@@ -11,6 +14,12 @@ const LoginPage = () => {
   const [fullName, setFullName] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  // Forgot password state
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotStatus, setForgotStatus] = useState(''); // '' | 'loading' | 'sent' | 'error'
   
   const { login, register, googleLogin } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -49,6 +58,18 @@ const LoginPage = () => {
       setError(result.error);
     }
     setIsLoading(false);
+  };
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    if (!forgotEmail) return;
+    setForgotStatus('loading');
+    try {
+      await axios.post(`${API}/api/auth/forgot-password`, { email: forgotEmail });
+      setForgotStatus('sent');
+    } catch {
+      setForgotStatus('error');
+    }
   };
 
   return (
@@ -111,17 +132,38 @@ const LoginPage = () => {
               />
             </div>
 
+            {/* Password with Eye Toggle */}
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" size={18} />
               <input 
-                type="password" 
+                type={showPassword ? 'text' : 'password'}
                 placeholder="Password" 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-lg py-3 pl-10 pr-4 text-white placeholder-white/30 focus:outline-none focus:border-[#00e659]/50 focus:ring-1 focus:ring-[#00e659]/50 transition-all font-mono text-sm"
+                className="w-full bg-white/5 border border-white/10 rounded-lg py-3 pl-10 pr-10 text-white placeholder-white/30 focus:outline-none focus:border-[#00e659]/50 focus:ring-1 focus:ring-[#00e659]/50 transition-all font-mono text-sm"
                 required
               />
+              <button 
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/80 transition-colors"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
+
+            {/* Forgot Password link */}
+            {!isRegistering && (
+              <div className="text-right">
+                <button
+                  type="button"
+                  onClick={() => { setShowForgotModal(true); setForgotEmail(email); setForgotStatus(''); }}
+                  className="text-xs text-[#00e659]/70 hover:text-[#00e659] transition-colors"
+                >
+                  Forgot password?
+                </button>
+              </div>
+            )}
 
             <button 
               type="submit" 
@@ -172,6 +214,67 @@ const LoginPage = () => {
              </Link>
         </div>
       </div>
+
+      {/* ── Forgot Password Modal ── */}
+      {showForgotModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="bg-[#0f0f0f] border border-white/10 rounded-2xl shadow-2xl p-8 w-full max-w-sm relative">
+            <button
+              onClick={() => setShowForgotModal(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors"
+            >
+              <X size={20} />
+            </button>
+
+            {forgotStatus === 'sent' ? (
+              <div className="text-center py-4">
+                <div className="w-14 h-14 rounded-full bg-[#00e659]/10 border border-[#00e659]/30 flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle2 className="w-7 h-7 text-[#00e659]" />
+                </div>
+                <h3 className="text-white font-bold text-xl mb-2">Check your inbox!</h3>
+                <p className="text-gray-400 text-sm">If <strong className="text-white">{forgotEmail}</strong> is registered, we've sent a password reset link. It expires in 30 minutes.</p>
+                <button
+                  onClick={() => setShowForgotModal(false)}
+                  className="mt-6 w-full bg-[#00e659] text-black font-bold py-2.5 rounded-lg hover:bg-[#00c94e] transition-colors"
+                >
+                  Done
+                </button>
+              </div>
+            ) : (
+              <>
+                <h3 className="text-white font-bold text-xl mb-1">Reset Password</h3>
+                <p className="text-gray-400 text-sm mb-6">Enter your registered email and we'll send you a secure reset link.</p>
+                {forgotStatus === 'error' && (
+                  <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-lg text-sm mb-4">
+                    Something went wrong. Please try again.
+                  </div>
+                )}
+                <form onSubmit={handleForgotPassword} className="space-y-4">
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" size={18} />
+                    <input
+                      type="email"
+                      placeholder="your@email.com"
+                      value={forgotEmail}
+                      onChange={(e) => setForgotEmail(e.target.value)}
+                      className="w-full bg-white/5 border border-white/10 rounded-lg py-3 pl-10 pr-4 text-white placeholder-white/30 focus:outline-none focus:border-[#00e659]/50 focus:ring-1 focus:ring-[#00e659]/50 transition-all text-sm"
+                      required
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={forgotStatus === 'loading'}
+                    className="w-full bg-[#00e659] text-black font-bold py-3 rounded-lg hover:bg-[#00c94e] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {forgotStatus === 'loading' ? 'Sending...' : 'Send Reset Link'}
+                    {forgotStatus !== 'loading' && <ArrowRight size={18} />}
+                  </button>
+                </form>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

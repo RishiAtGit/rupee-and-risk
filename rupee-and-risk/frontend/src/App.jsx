@@ -11,6 +11,7 @@ import LegalPage from './pages/LegalPage';
 import ProDashboardPage from './pages/ProDashboardPage';
 import LoginPage from './pages/LoginPage';
 import ProtectedRoute from './components/ProtectedRoute';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 
 function App() {
   const location = useLocation();
@@ -41,6 +42,7 @@ function App() {
           <Route path="/growth-triggers" element={<GrowthTriggersPage />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/legal" element={<LegalPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
         </Routes>
       </main>
       <Footer />
