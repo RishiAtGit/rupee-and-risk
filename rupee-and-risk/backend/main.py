@@ -84,7 +84,7 @@ def get_all_companies(user: User = Depends(get_pro_user)):
 def get_public_companies():
     """Public endpoint for marketing that hides proprietary insights."""
     with Session(engine) as session:
-        calls = session.exec(select(EarningsCall).order_by(EarningsCall.id.asc()).limit(9)).all()
+        calls = session.exec(select(EarningsCall).order_by(EarningsCall.id.desc()).limit(20)).all()
         result = []
         for c in calls:
             result.append({

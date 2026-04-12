@@ -74,7 +74,7 @@ export default function ProDashboardPage() {
     }, [chatMessages]);
 
     // ---- Helpers ----
-    const getTriggers = (triggerText, truncateLength = 47) => {
+    const getTriggers = (triggerText, truncateLength = 47, maxItems = 4) => {
         if (!triggerText) return [];
         const rawLines = triggerText.split('\n').filter(l => l.trim().length > 0 && !l.startsWith('**Stage'));
         const tags = rawLines.map(l => {
@@ -82,7 +82,7 @@ export default function ProDashboardPage() {
             if (truncateLength === -1) return clean;
             return clean.length > truncateLength ? clean.substring(0, truncateLength) + '...' : clean;
         });
-        return tags.slice(0, 4);
+        return maxItems === -1 ? tags : tags.slice(0, maxItems);
     };
 
     const getStage = (triggerText) => {
@@ -660,7 +660,7 @@ export default function ProDashboardPage() {
                                 <div>
                                     <h3 className="text-[10px] uppercase font-mono tracking-widest text-gray-400 mb-2 flex items-center gap-2"><Cpu className="w-3 h-3 text-blue-400" /> Extracted Catalysts</h3>
                                     <div className="flex flex-wrap gap-2">
-                                        {getTriggers(selectedCompany.growth_triggers, -1).map((t, i) => (
+                                        {getTriggers(selectedCompany.growth_triggers, -1, -1).map((t, i) => (
                                             <div key={i} className="px-3 py-1.5 rounded-lg border border-blue-500/20 bg-blue-500/10 text-blue-400 text-[11px] font-bold tracking-wide">{t}</div>
                                         ))}
                                     </div>
