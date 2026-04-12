@@ -137,7 +137,7 @@ export default function PricingPage() {
                         <h3 className="text-2xl font-bold text-black mb-2">Monthly Pass</h3>
                         <p className="text-gray-500 font-light text-sm mb-8">Flexible access to all premium intelligence.</p>
                         <div className="flex items-baseline gap-2 mb-10">
-                            <span className="text-6xl font-black text-black tracking-tighter">₹1,999</span>
+                            <span className="text-6xl font-black text-black tracking-tighter">₹199</span>
                             <span className="text-gray-400 font-medium">/mo</span>
                         </div>
 
@@ -151,7 +151,7 @@ export default function PricingPage() {
                         </ul>
 
                         <button 
-                            onClick={() => handlePayment(1999)} 
+                            onClick={() => handlePayment(199)} 
                             disabled={isProcessing}
                             className="w-full bg-black text-white font-bold text-lg py-5 rounded-full hover:bg-gray-800 transition-colors tracking-tight flex items-center justify-center gap-2">
                             {isProcessing ? 'Processing Securely...' : 'Start Monthly Plan'}
@@ -171,7 +171,7 @@ export default function PricingPage() {
                         <p className="text-gray-400 font-light text-sm mb-8 relative z-10">Save 16% with our continuous tracking plan.</p>
                         <div className="flex items-baseline gap-2 mb-10 relative z-10">
                             <span className="text-6xl font-black tracking-tighter flex items-center gap-3">
-                                <span className="text-gray-500 line-through text-4xl">₹5,997</span> ₹4,999
+                                <span className="text-gray-500 line-through text-4xl">₹597</span> ₹549
                             </span>
                             <span className="text-gray-400 font-medium">/qtr</span>
                         </div>
@@ -186,7 +186,7 @@ export default function PricingPage() {
                         </ul>
 
                         <button 
-                            onClick={() => handlePayment(4999)}
+                            onClick={() => handlePayment(549)}
                             disabled={isProcessing}
                             className="w-full bg-[#00e659] text-black font-bold text-lg py-5 rounded-full hover:bg-white transition-colors tracking-tight flex items-center justify-center shadow-[0_0_30px_rgba(0,230,89,0.3)] relative z-10">
                             {isProcessing ? 'Loading Terminal Securely...' : 'Subscribe Now'}

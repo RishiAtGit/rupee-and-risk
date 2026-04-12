@@ -28,7 +28,7 @@ export default function LegalPage() {
                     <p className="mb-4">We take your privacy seriously. We only collect essential information required to provide you with an optimal reading experience and manage your premium subscription.</p>
                     <ul className="mb-4 list-disc pl-6 space-y-2">
                         <li>We do not sell your personal data to third parties.</li>
-                        <li>Payment information is processed securely via our payment partners.</li>
+                        <li>Payment information is processed securely via <strong>Razorpay</strong>, our trusted payment gateway.</li>
                         <li>We use cookies solely, to remember your session and preferences.</li>
                     </ul>
 
