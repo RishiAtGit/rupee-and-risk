@@ -14,9 +14,8 @@ psycopg2-binary==2.9.10
 # AI / Google Gemini
 google-genai==1.10.0
 
-# Authentication
-PyJWT==2.10.1
-bcrypt==4.3.0
+# Authentication (Firebase Admin SDK — replaces custom JWT/bcrypt)
+firebase-admin==6.7.0
 
 # Payments
 razorpay==2.0.1
@@ -33,4 +32,3 @@ python-dotenv==1.2.1
 
 # Utilities
 python-multipart==0.0.22
-resend==2.10.0

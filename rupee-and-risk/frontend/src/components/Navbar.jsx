@@ -40,7 +40,10 @@ export default function Navbar() {
                             <span className={`absolute bottom-0 left-0 w-full h-[2px] bg-[#00e659] transform origin-left transition-transform duration-300 ${isActive('/growth-triggers') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></span>
                         </Link>
 
-                        <div className="pl-6 border-l border-gray-200">
+                        <div className="pl-6 border-l border-gray-200 flex items-center gap-3">
+                            <Link to="/login" className="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black transition-colors px-4 py-2.5 rounded-full border border-gray-200 hover:border-gray-400 whitespace-nowrap">
+                                Login
+                            </Link>
                             <Link to="/pricing" className="bg-black hover:bg-gray-800 text-white text-xs font-bold px-6 py-2.5 rounded-full uppercase tracking-widest transition-all hover:shadow-lg hover:shadow-black/20 hover:-translate-y-0.5 block whitespace-nowrap">
                                 Pro Access
                             </Link>

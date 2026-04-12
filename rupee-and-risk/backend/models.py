@@ -56,8 +56,9 @@ class RiskItem(SQLModel, table=True):
 class User(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     email: str = Field(unique=True, index=True)
-    hashed_password: Optional[str] = Field(default=None) # Optional for Google OAuth users
-    google_id: Optional[str] = Field(default=None)
+    hashed_password: Optional[str] = Field(default=None)  # Legacy — kept for migration safety
+    google_id: Optional[str] = Field(default=None)        # Legacy — superseded by Firebase
+    firebase_uid: Optional[str] = Field(default=None, index=True)  # Firebase Auth UID
     full_name: str = Field(default="")
     is_pro_member: bool = Field(default=False)
     created_at: datetime = Field(default_factory=datetime.utcnow)
