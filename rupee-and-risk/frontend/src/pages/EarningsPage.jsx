@@ -27,6 +27,17 @@ export default function EarningsPage() {
         return `${info.month} ${String(day).padStart(2, '0')}, ${year}`;
     };
 
+    // Numeric sort key: higher = more recent
+    const getQuarterSortKey = (quarter) => {
+        const monthNum = { 'Q1': 7, 'Q2': 10, 'Q3': 1, 'Q4': 5 };
+        if (!quarter) return 0;
+        const q = quarter.substring(0, 2);
+        const fyMatch = quarter.match(/FY(\d{2})/);
+        const fy = fyMatch ? parseInt(fyMatch[1]) : 26;
+        const year = (q === 'Q1' || q === 'Q2') ? 2000 + fy - 1 : 2000 + fy;
+        return year * 100 + (monthNum[q] || 1);
+    };
+
     useEffect(() => {
         window.scrollTo(0, 0);
         axios.get(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/companies/public`)
@@ -78,7 +89,8 @@ export default function EarningsPage() {
             {/* Grid */}
             <div className="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 pb-32">
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                    {companies
+                    {[...companies]
+                        .sort((a, b) => getQuarterSortKey(b.quarter) - getQuarterSortKey(a.quarter))
                         .filter(c => activeQuarter === 'Latest Summaries' || c.quarter === activeQuarter)
                         .map(company => (
                         <div key={company.id} className="h-full">

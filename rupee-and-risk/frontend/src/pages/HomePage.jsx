@@ -11,10 +11,10 @@ export default function HomePage() {
     // Derive a realistic results-announcement date from the quarter string
     const getQuarterDate = (quarter, id = 0) => {
         const monthMap = {
-            'Q1': { month: 'Jul', baseDay: 10 },
-            'Q2': { month: 'Oct', baseDay: 15 },
-            'Q3': { month: 'Jan', baseDay: 12 },
-            'Q4': { month: 'May', baseDay: 8 },
+            'Q1': { month: 'Jul', baseDay: 10, monthNum: 7 },
+            'Q2': { month: 'Oct', baseDay: 15, monthNum: 10 },
+            'Q3': { month: 'Jan', baseDay: 12, monthNum: 1 },
+            'Q4': { month: 'May', baseDay: 8, monthNum: 5 },
         };
         if (!quarter) return 'Jan 15, 2026';
         const q = quarter.substring(0, 2);
@@ -24,6 +24,17 @@ export default function HomePage() {
         const day = info.baseDay + (id % 15);
         const year = (q === 'Q1' || q === 'Q2') ? 2000 + fy - 1 : 2000 + fy;
         return `${info.month} ${String(day).padStart(2, '0')}, ${year}`;
+    };
+
+    // Numeric sort key: higher = more recent
+    const getQuarterSortKey = (quarter) => {
+        const monthNum = { 'Q1': 7, 'Q2': 10, 'Q3': 1, 'Q4': 5 };
+        if (!quarter) return 0;
+        const q = quarter.substring(0, 2);
+        const fyMatch = quarter.match(/FY(\d{2})/);
+        const fy = fyMatch ? parseInt(fyMatch[1]) : 26;
+        const year = (q === 'Q1' || q === 'Q2') ? 2000 + fy - 1 : 2000 + fy;
+        return year * 100 + (monthNum[q] || 1);
     };
 
     useEffect(() => {
@@ -42,10 +53,12 @@ export default function HomePage() {
     if (loading) return <div className="min-h-screen bg-black flex items-center justify-center font-medium text-gray-400">Loading Alpha...</div>;
     if (companies.length === 0) return <div className="min-h-screen bg-black flex items-center justify-center font-medium text-gray-400">No data available.</div>;
 
-    const heroCompany = companies[0];
-    const bentoSmall1 = companies[1];
-    const bentoSmall2 = companies[2];
-    const recentCompanies = companies.slice(3);
+    // Sort by date: newest quarter first
+    const sorted = [...companies].sort((a, b) => getQuarterSortKey(b.quarter) - getQuarterSortKey(a.quarter));
+    const heroCompany = sorted[0];
+    const bentoSmall1 = sorted[1];
+    const bentoSmall2 = sorted[2];
+    const recentCompanies = sorted.slice(3);
 
     return (
         <div className="bg-[#fafafa] min-h-screen font-sans selection:bg-[#00e659]/30">
