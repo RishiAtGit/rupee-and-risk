@@ -192,7 +192,7 @@ export default function PricingPage() {
                             {isProcessing ? 'Loading Terminal Securely...' : 'Subscribe Now'}
                         </button>
                         <p className="text-center text-xs text-gray-500 mt-6 flex items-center justify-center gap-2 relative z-10">
-                            Secure 256-bit encryption <Lock className="h-3 w-3" />
+                            Secure payment via Razorpay <Lock className="h-3 w-3" />
                         </p>
                     </div>
 

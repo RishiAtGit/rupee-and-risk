@@ -357,7 +357,7 @@ export default function GrowthTriggersPage() {
                         <div className="relative z-10 flex flex-col items-center">
                             <div className="uppercase tracking-widest font-bold text-xs text-[#00e659] mb-6 bg-[#00e659]/10 border border-[#00e659]/20 px-4 py-2 rounded-full">Pro Access</div>
                             <div className="flex items-baseline justify-center gap-2 mb-10">
-                                <span className="text-6xl font-black text-white">₹4,999</span>
+                                <span className="text-6xl font-black text-white">₹549</span>
                                 <span className="text-xl text-gray-500 font-mono">/quarter</span>
                             </div>
 
@@ -375,7 +375,7 @@ export default function GrowthTriggersPage() {
                             </Link>
                             
                             <p className="text-gray-500 text-xs font-mono tracking-widest mt-8 flex items-center justify-center gap-2 uppercase">
-                                Secure payment via Stripe
+                                Secure payment via Razorpay
                             </p>
                         </div>
                     </div>

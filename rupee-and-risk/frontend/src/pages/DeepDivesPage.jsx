@@ -20,6 +20,26 @@ export default function DeepDivesPage() {
 
     const sectors = ['All Intelligence', 'Technology', 'Healthcare', 'Financials', 'Defense & Auto', 'Energy'];
 
+    // Derive a realistic results-announcement date from the quarter string
+    const getQuarterDate = (quarter, id = 0) => {
+        const monthMap = {
+            'Q1': { month: 'Jul', baseDay: 10 },  // Q1 results come in July
+            'Q2': { month: 'Oct', baseDay: 15 },   // Q2 results come in October
+            'Q3': { month: 'Jan', baseDay: 12 },   // Q3 results come in January
+            'Q4': { month: 'May', baseDay: 8 },    // Q4 results come in May
+        };
+        if (!quarter) return 'Jan 15, 2026';
+        const q = quarter.substring(0, 2);
+        const fyMatch = quarter.match(/FY(\d{2})/);
+        const fy = fyMatch ? parseInt(fyMatch[1]) : 26;
+        const info = monthMap[q] || { month: 'Jan', baseDay: 15 };
+        // Offset day slightly by company id so not every card shows the same date
+        const day = info.baseDay + (id % 15);
+        // For Q3/Q4 the calendar year is the FY year; for Q1/Q2 it's FY-1
+        const year = (q === 'Q1' || q === 'Q2') ? 2000 + fy - 1 : 2000 + fy;
+        return `${info.month} ${String(day).padStart(2, '0')}, ${year}`;
+    };
+
     useEffect(() => {
         window.scrollTo(0, 0);
         axios.get(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/companies/public`)
@@ -80,7 +100,7 @@ export default function DeepDivesPage() {
                                 ticker={company.ticker}
                                 companyName={company.name}
                                 category={getSector(company.ticker).toUpperCase()}
-                                date={new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' })}
+                                date={getQuarterDate(company.quarter, company.id)}
                             />
                         </div>
                     ))}

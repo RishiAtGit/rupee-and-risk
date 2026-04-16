@@ -9,6 +9,24 @@ export default function EarningsPage() {
     
     const quarters = ['Latest Summaries', 'Q4 FY25', 'Q1 FY26', 'Q2 FY26', 'Q3 FY26', 'Q4 FY26'];
 
+    // Derive a realistic results-announcement date from the quarter string
+    const getQuarterDate = (quarter, id = 0) => {
+        const monthMap = {
+            'Q1': { month: 'Jul', baseDay: 10 },
+            'Q2': { month: 'Oct', baseDay: 15 },
+            'Q3': { month: 'Jan', baseDay: 12 },
+            'Q4': { month: 'May', baseDay: 8 },
+        };
+        if (!quarter) return 'Jan 15, 2026';
+        const q = quarter.substring(0, 2);
+        const fyMatch = quarter.match(/FY(\d{2})/);
+        const fy = fyMatch ? parseInt(fyMatch[1]) : 26;
+        const info = monthMap[q] || { month: 'Jan', baseDay: 15 };
+        const day = info.baseDay + (id % 15);
+        const year = (q === 'Q1' || q === 'Q2') ? 2000 + fy - 1 : 2000 + fy;
+        return `${info.month} ${String(day).padStart(2, '0')}, ${year}`;
+    };
+
     useEffect(() => {
         window.scrollTo(0, 0);
         axios.get(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/companies/public`)
@@ -69,7 +87,7 @@ export default function EarningsPage() {
                                 companyName={company.name}
                                 category={company.quarter || "Earnings"}
                                 isEarnings={true}
-                                date={new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' })}
+                                date={getQuarterDate(company.quarter, company.id)}
                             />
                         </div>
                     ))}
