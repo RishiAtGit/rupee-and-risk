@@ -92,9 +92,16 @@ export default function ProDashboardPage() {
     };
 
     const getIndustry = (ticker) => {
-        const hash = ticker.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
-        const ind = ['Aerospace & Defence', 'FMCG - Personal Care', 'Capital Goods', 'IT - Software', 'Banks - Small Finance', 'Textiles', 'Metals'];
-        return ind[hash % ind.length];
+        const t = ticker.toUpperCase();
+        if (['TCS', 'INFY', 'TECHM', 'WIPRO', 'HCLTECH', 'LTIM'].includes(t)) return 'IT - Software';
+        if (['HDFCBANK', 'ICICIBANK', 'SBI', 'KOTAKBANK', 'AXISBANK', 'BAJFINANCE', 'INDUSINDBK', 'PNB'].includes(t)) return 'Financial Services';
+        if (['SUNPHARMA', 'DIVISLAB', 'APOLLOHOSP', 'CIPLA', 'DRREDDY'].includes(t)) return 'Healthcare & Pharma';
+        if (['RELIANCE', 'ONGC', 'BPCL', 'COALINDIA', 'WAAREEENER', 'ENERGY'].includes(t)) return 'Energy & Oil';
+        if (['M&M', 'TATAMOTORS', 'MARUTI', 'EICHERMOT', 'HEROMOTOCO', 'L&T', 'HAL', 'BEL'].includes(t)) return 'Auto & Defence';
+        if (['ASIANPAINT', 'BRITANNIA', 'TATACONSUM', 'ITC', 'HUL', 'TITAN'].includes(t)) return 'FMCG & Consumer';
+        if (['TATASTEEL', 'HINDALCO', 'JSWSTEEL'].includes(t)) return 'Metals & Mining';
+        if (['UPL', 'SRF', 'PIDILITIND'].includes(t)) return 'Chemicals';
+        return 'Diversified Corporates';
     };
 
     const getRS = (ticker) => {
