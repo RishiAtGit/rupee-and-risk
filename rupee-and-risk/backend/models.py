@@ -14,7 +14,7 @@ class EarningsCall(SQLModel, table=True):
     strategic_commentary: str = Field(default="")
     qa_highlights: str = Field(default="")
     key_takeaway: str = Field(default="")
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: Optional[datetime] = Field(default_factory=datetime.utcnow, nullable=True)
     
     financials: List["FinancialMetric"] = Relationship(back_populates="call")
     triggers: List["GrowthTrigger"] = Relationship(back_populates="call")

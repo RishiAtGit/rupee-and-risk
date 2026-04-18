@@ -10,7 +10,7 @@ export default function HomePage() {
 
     // Sort purely by backend fetch timestamp
     const formatFetchDate = (isoString) => {
-        if (!isoString) return new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+        if (!isoString) return "Date N/A";
         return new Date(isoString).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
     };
 
@@ -31,7 +31,12 @@ export default function HomePage() {
     if (companies.length === 0) return <div className="min-h-screen bg-black flex items-center justify-center font-medium text-gray-400">No data available.</div>;
 
     // Sorted chronologically strictly by API fetch timestamp
-    const sorted = [...companies].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+    const sorted = [...companies].sort((a, b) => {
+        const tA = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const tB = b.created_at ? new Date(b.created_at).getTime() : 0;
+        if (tA !== tB) return tB - tA;
+        return (b.id || 0) - (a.id || 0);
+    });
     const heroCompany = sorted[0];
     const bentoSmall1 = sorted[1];
     const bentoSmall2 = sorted[2];

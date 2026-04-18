@@ -10,7 +10,7 @@ export default function EarningsPage() {
     const quarters = ['Latest Summaries', 'Q4 FY25', 'Q1 FY26', 'Q2 FY26', 'Q3 FY26', 'Q4 FY26'];
 
     const formatFetchDate = (isoString) => {
-        if (!isoString) return new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+        if (!isoString) return "Date N/A";
         return new Date(isoString).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
     };
 
@@ -66,7 +66,12 @@ export default function EarningsPage() {
             <div className="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 pb-32">
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                     {[...companies]
-                        .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
+                        .sort((a, b) => {
+                            const tA = a.created_at ? new Date(a.created_at).getTime() : 0;
+                            const tB = b.created_at ? new Date(b.created_at).getTime() : 0;
+                            if (tA !== tB) return tB - tA;
+                            return (b.id || 0) - (a.id || 0);
+                        })
                         .filter(c => activeQuarter === 'Latest Summaries' || c.quarter === activeQuarter)
                         .map((company, index) => (
                         <div key={company.id} className="h-full">
