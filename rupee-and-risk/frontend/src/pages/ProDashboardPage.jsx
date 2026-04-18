@@ -51,6 +51,14 @@ export default function ProDashboardPage() {
         })
             .then(res => { setCompanies(res.data); setLoading(false); })
             .catch(() => setLoading(false));
+
+        // Lock terminal mode: intercept back button to prevent accidental exiting
+        window.history.pushState(null, '', window.location.href);
+        const handlePopState = () => {
+            window.history.pushState(null, '', window.location.href);
+        };
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
     }, [token]);
 
     // Reset chat when switching company
@@ -244,10 +252,10 @@ export default function ProDashboardPage() {
 
                 {/* Logo */}
                 <div className="h-16 flex items-center px-6 border-b border-white/5 relative z-10">
-                    <Link to="/" className="flex items-center gap-2 group">
+                    <div className="flex items-center gap-2 group cursor-pointer" onClick={() => { setActiveTab('grid'); setSelectedCompany(null); }}>
                         <div className="bg-[#00e659] text-black w-7 h-7 rounded flex items-center justify-center font-black text-xs shadow-[0_0_15px_rgba(0,230,89,0.3)] group-hover:shadow-[0_0_25px_rgba(0,230,89,0.5)] transition-shadow">R</div>
                         <span className="font-bold tracking-tight text-white group-hover:text-[#00e659] transition-colors">Rupee And Risk <span className="text-[#00e659] ml-1">PRO</span></span>
-                    </Link>
+                    </div>
                 </div>
 
                 {/* Nav */}
@@ -276,7 +284,7 @@ export default function ProDashboardPage() {
                 {/* Bottom */}
                 <div className="p-4 border-t border-white/5 relative z-10">
                     <div onClick={() => alert("Preferences module coming in Phase 5.")} className="flex items-center gap-3 px-3 py-2 rounded-xl text-gray-400 hover:text-white cursor-pointer transition-colors"><Settings className="h-4 w-4" /><span className="text-sm font-semibold">Preferences</span></div>
-                    <Link to="/pricing" className="flex items-center gap-3 px-3 py-2 rounded-xl text-gray-400 hover:text-white cursor-pointer transition-colors"><CreditCard className="h-4 w-4" /><span className="text-sm font-semibold">Billing</span></Link>
+                    <div onClick={() => alert("Billing configurations are managed externally.")} className="flex items-center gap-3 px-3 py-2 rounded-xl text-gray-400 hover:text-white cursor-pointer transition-colors"><CreditCard className="h-4 w-4" /><span className="text-sm font-semibold">Billing</span></div>
                     <button onClick={() => { logout(); navigate('/'); }} className="w-full flex items-center justify-start gap-3 px-3 py-2 rounded-xl text-red-500 hover:bg-red-500/10 cursor-pointer transition-colors mt-2">
                         <LogOut className="h-4 w-4" /><span className="text-sm font-semibold">Exit Terminal</span>
                     </button>
