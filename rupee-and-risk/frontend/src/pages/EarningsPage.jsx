@@ -9,6 +9,17 @@ export default function EarningsPage() {
     
     const quarters = ['Latest Summaries', 'Q4 FY25', 'Q1 FY26', 'Q2 FY26', 'Q3 FY26', 'Q4 FY26'];
 
+    // We sort the array strictly by Quarter (Descending) and then DB ID (fetch time)
+    const getQuarterSortKey = (quarter, id = 0) => {
+        const monthNum = { 'Q1': 7, 'Q2': 10, 'Q3': 1, 'Q4': 5 };
+        if (!quarter) return id;
+        const q = quarter.substring(0, 2);
+        const fyMatch = quarter.match(/FY(\d{2})/);
+        const fy = fyMatch ? parseInt(fyMatch[1]) : 26;
+        const year = (q === 'Q1' || q === 'Q2') ? 2000 + fy - 1 : 2000 + fy;
+        return year * 100000 + (monthNum[q] || 1) * 1000 + id;
+    };
+
     const getQuarterDate = (quarter, index = 0) => {
         const monthMap = { 'Q1': 'Jul', 'Q2': 'Oct', 'Q3': 'Jan', 'Q4': 'May' };
         if (!quarter) return 'Jan 15, 2026';
@@ -17,7 +28,7 @@ export default function EarningsPage() {
         const fy = fyMatch ? parseInt(fyMatch[1]) : 26;
         const month = monthMap[q] || 'Jan';
         const year = (q === 'Q1' || q === 'Q2') ? 2000 + fy - 1 : 2000 + fy;
-        const day = 26 - (index % 25);
+        const day = 28 - (index % 25);
         return `${month} ${String(day).padStart(2, '0')}, ${year}`;
     };
 
@@ -72,7 +83,8 @@ export default function EarningsPage() {
             {/* Grid */}
             <div className="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 pb-32">
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                    {companies
+                    {[...companies]
+                        .sort((a, b) => getQuarterSortKey(b.quarter, b.id) - getQuarterSortKey(a.quarter, a.id))
                         .filter(c => activeQuarter === 'Latest Summaries' || c.quarter === activeQuarter)
                         .map((company, index) => (
                         <div key={company.id} className="h-full">
