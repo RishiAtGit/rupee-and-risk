@@ -27,14 +27,16 @@ export default function HomePage() {
     };
 
     // Numeric sort key: higher = more recent
-    const getQuarterSortKey = (quarter) => {
+    const getQuarterSortKey = (quarter, id = 0) => {
         const monthNum = { 'Q1': 7, 'Q2': 10, 'Q3': 1, 'Q4': 5 };
+        const monthBaseDay = { 'Q1': 10, 'Q2': 15, 'Q3': 12, 'Q4': 8 };
         if (!quarter) return 0;
         const q = quarter.substring(0, 2);
         const fyMatch = quarter.match(/FY(\d{2})/);
         const fy = fyMatch ? parseInt(fyMatch[1]) : 26;
         const year = (q === 'Q1' || q === 'Q2') ? 2000 + fy - 1 : 2000 + fy;
-        return year * 100 + (monthNum[q] || 1);
+        const day = (monthBaseDay[q] || 15) + (id % 15);
+        return year * 10000 + (monthNum[q] || 1) * 100 + day;
     };
 
     useEffect(() => {
@@ -53,8 +55,8 @@ export default function HomePage() {
     if (loading) return <div className="min-h-screen bg-black flex items-center justify-center font-medium text-gray-400">Loading Alpha...</div>;
     if (companies.length === 0) return <div className="min-h-screen bg-black flex items-center justify-center font-medium text-gray-400">No data available.</div>;
 
-    // Sort by date: newest quarter first
-    const sorted = [...companies].sort((a, b) => getQuarterSortKey(b.quarter) - getQuarterSortKey(a.quarter));
+    // Sort by date: newest quarter and day first
+    const sorted = [...companies].sort((a, b) => getQuarterSortKey(b.quarter, b.id) - getQuarterSortKey(a.quarter, a.id));
     const heroCompany = sorted[0];
     const bentoSmall1 = sorted[1];
     const bentoSmall2 = sorted[2];
