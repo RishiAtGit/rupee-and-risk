@@ -8,35 +8,26 @@ export default function HomePage() {
     const [companies, setCompanies] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // Derive a realistic results-announcement date from the quarter string
-    const getQuarterDate = (quarter, id = 0) => {
-        const monthMap = {
-            'Q1': { month: 'Jul', baseDay: 10, monthNum: 7 },
-            'Q2': { month: 'Oct', baseDay: 15, monthNum: 10 },
-            'Q3': { month: 'Jan', baseDay: 12, monthNum: 1 },
-            'Q4': { month: 'May', baseDay: 8, monthNum: 5 },
-        };
-        if (!quarter) return 'Jan 15, 2026';
+    // Derive the results-announcement month and year
+    const getQuarterDate = (quarter) => {
+        const monthMap = { 'Q1': 'Jul', 'Q2': 'Oct', 'Q3': 'Jan', 'Q4': 'May' };
+        if (!quarter) return '2026';
         const q = quarter.substring(0, 2);
         const fyMatch = quarter.match(/FY(\d{2})/);
         const fy = fyMatch ? parseInt(fyMatch[1]) : 26;
-        const info = monthMap[q] || { month: 'Jan', baseDay: 15 };
-        const day = info.baseDay + (id % 15);
         const year = (q === 'Q1' || q === 'Q2') ? 2000 + fy - 1 : 2000 + fy;
-        return `${info.month} ${String(day).padStart(2, '0')}, ${year}`;
+        return `${monthMap[q] || 'Jan'} ${year}`;
     };
 
-    // Numeric sort key: higher = more recent
+    // Numeric sort key: Year -> Month -> DB ID (fetch time)
     const getQuarterSortKey = (quarter, id = 0) => {
         const monthNum = { 'Q1': 7, 'Q2': 10, 'Q3': 1, 'Q4': 5 };
-        const monthBaseDay = { 'Q1': 10, 'Q2': 15, 'Q3': 12, 'Q4': 8 };
-        if (!quarter) return 0;
+        if (!quarter) return id;
         const q = quarter.substring(0, 2);
         const fyMatch = quarter.match(/FY(\d{2})/);
         const fy = fyMatch ? parseInt(fyMatch[1]) : 26;
         const year = (q === 'Q1' || q === 'Q2') ? 2000 + fy - 1 : 2000 + fy;
-        const day = (monthBaseDay[q] || 15) + (id % 15);
-        return year * 10000 + (monthNum[q] || 1) * 100 + day;
+        return year * 100000 + (monthNum[q] || 1) * 1000 + id;
     };
 
     useEffect(() => {
@@ -145,7 +136,7 @@ export default function HomePage() {
                                     <span className="bg-black text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full flex items-center gap-2">
                                         <div className="w-1.5 h-1.5 rounded-full bg-[#00e659] animate-pulse"></div> Live Deep Dive
                                     </span>
-                                    <span className="text-gray-400 text-xs font-bold uppercase tracking-widest">{getQuarterDate(heroCompany.quarter, heroCompany.id)}</span>
+                                    <span className="text-gray-400 text-xs font-bold uppercase tracking-widest">{getQuarterDate(heroCompany.quarter)}</span>
                                 </div>
                                 <h3 className="text-6xl lg:text-[5.5rem] font-black text-black tracking-tighter leading-[0.9] mb-4 group-hover:text-[#00e659] transition-colors">{heroCompany.ticker}</h3>
                                 <p className="text-xl text-gray-500 font-light max-w-xl line-clamp-2">Comprehensive strategic analysis breaking down management guidance, future capex plans, and margin expansion triggers entirely.</p>
@@ -203,7 +194,7 @@ export default function HomePage() {
                                     ticker={company.ticker}
                                     companyName={company.name}
                                     category="Archive"
-                                    date={getQuarterDate(company.quarter, company.id)}
+                                    date={getQuarterDate(company.quarter)}
                                 />
                             ))}
                         </div>
