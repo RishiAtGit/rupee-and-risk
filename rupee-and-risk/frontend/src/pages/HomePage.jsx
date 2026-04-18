@@ -8,8 +8,18 @@ export default function HomePage() {
     const [companies, setCompanies] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // Revert to the specific date generation the user preferred, 
-    // using array index to ensure it perfectly descends alongside the fetch order.
+    // We sort the array strictly by Quarter (Descending) and then DB ID (fetch time)
+    const getQuarterSortKey = (quarter, id = 0) => {
+        const monthNum = { 'Q1': 7, 'Q2': 10, 'Q3': 1, 'Q4': 5 };
+        if (!quarter) return id;
+        const q = quarter.substring(0, 2);
+        const fyMatch = quarter.match(/FY(\d{2})/);
+        const fy = fyMatch ? parseInt(fyMatch[1]) : 26;
+        const year = (q === 'Q1' || q === 'Q2') ? 2000 + fy - 1 : 2000 + fy;
+        return year * 100000 + (monthNum[q] || 1) * 1000 + id;
+    };
+
+    // Realistic dates that accurately descend sequentially alongside the arrays
     const getQuarterDate = (quarter, index = 0) => {
         const monthMap = { 'Q1': 'Jul', 'Q2': 'Oct', 'Q3': 'Jan', 'Q4': 'May' };
         if (!quarter) return 'Jan 15, 2026';
@@ -18,7 +28,7 @@ export default function HomePage() {
         const fy = fyMatch ? parseInt(fyMatch[1]) : 26;
         const month = monthMap[q] || 'Jan';
         const year = (q === 'Q1' || q === 'Q2') ? 2000 + fy - 1 : 2000 + fy;
-        const day = 26 - (index % 25);
+        const day = 28 - (index % 25);
         return `${month} ${String(day).padStart(2, '0')}, ${year}`;
     };
 
@@ -38,11 +48,12 @@ export default function HomePage() {
     if (loading) return <div className="min-h-screen bg-black flex items-center justify-center font-medium text-gray-400">Loading Alpha...</div>;
     if (companies.length === 0) return <div className="min-h-screen bg-black flex items-center justify-center font-medium text-gray-400">No data available.</div>;
 
-    // Sorted strictly by backend fetch order
-    const heroCompany = companies[0];
-    const bentoSmall1 = companies[1];
-    const bentoSmall2 = companies[2];
-    const recentCompanies = companies.slice(3);
+    // Sorted chronologically descending (May -> Jan -> Oct -> Jul)
+    const sorted = [...companies].sort((a, b) => getQuarterSortKey(b.quarter, b.id) - getQuarterSortKey(a.quarter, a.id));
+    const heroCompany = sorted[0];
+    const bentoSmall1 = sorted[1];
+    const bentoSmall2 = sorted[2];
+    const recentCompanies = sorted.slice(3);
 
     return (
         <div className="bg-[#fafafa] min-h-screen font-sans selection:bg-[#00e659]/30">
@@ -179,7 +190,7 @@ export default function HomePage() {
                             </h2>
                         </div>
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                            {recentCompanies.map(company => (
+                            {recentCompanies.map((company, index) => (
                                 <ArticleCard
                                     key={company.id}
                                     ticker={company.ticker}
