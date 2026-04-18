@@ -8,28 +8,10 @@ export default function HomePage() {
     const [companies, setCompanies] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // We sort the array strictly by Quarter (Descending) and then DB ID (fetch time)
-    const getQuarterSortKey = (quarter, id = 0) => {
-        const monthNum = { 'Q1': 7, 'Q2': 10, 'Q3': 1, 'Q4': 5 };
-        if (!quarter) return id;
-        const q = quarter.substring(0, 2);
-        const fyMatch = quarter.match(/FY(\d{2})/);
-        const fy = fyMatch ? parseInt(fyMatch[1]) : 26;
-        const year = (q === 'Q1' || q === 'Q2') ? 2000 + fy - 1 : 2000 + fy;
-        return year * 100000 + (monthNum[q] || 1) * 1000 + id;
-    };
-
-    // Realistic dates that accurately descend sequentially alongside the arrays
-    const getQuarterDate = (quarter, index = 0) => {
-        const monthMap = { 'Q1': 'Jul', 'Q2': 'Oct', 'Q3': 'Jan', 'Q4': 'May' };
-        if (!quarter) return 'Jan 15, 2026';
-        const q = quarter.substring(0, 2);
-        const fyMatch = quarter.match(/FY(\d{2})/);
-        const fy = fyMatch ? parseInt(fyMatch[1]) : 26;
-        const month = monthMap[q] || 'Jan';
-        const year = (q === 'Q1' || q === 'Q2') ? 2000 + fy - 1 : 2000 + fy;
-        const day = 28 - (index % 25);
-        return `${month} ${String(day).padStart(2, '0')}, ${year}`;
+    // Sort purely by backend fetch timestamp
+    const formatFetchDate = (isoString) => {
+        if (!isoString) return new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+        return new Date(isoString).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
     };
 
     useEffect(() => {
@@ -48,8 +30,8 @@ export default function HomePage() {
     if (loading) return <div className="min-h-screen bg-black flex items-center justify-center font-medium text-gray-400">Loading Alpha...</div>;
     if (companies.length === 0) return <div className="min-h-screen bg-black flex items-center justify-center font-medium text-gray-400">No data available.</div>;
 
-    // Sorted chronologically descending (May -> Jan -> Oct -> Jul)
-    const sorted = [...companies].sort((a, b) => getQuarterSortKey(b.quarter, b.id) - getQuarterSortKey(a.quarter, a.id));
+    // Sorted chronologically strictly by API fetch timestamp
+    const sorted = [...companies].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
     const heroCompany = sorted[0];
     const bentoSmall1 = sorted[1];
     const bentoSmall2 = sorted[2];
@@ -138,7 +120,7 @@ export default function HomePage() {
                                     <span className="bg-black text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full flex items-center gap-2">
                                         <div className="w-1.5 h-1.5 rounded-full bg-[#00e659] animate-pulse"></div> Live Deep Dive
                                     </span>
-                                    <span className="text-gray-400 text-xs font-bold uppercase tracking-widest">{getQuarterDate(heroCompany.quarter, 0)}</span>
+                                    <span className="text-gray-400 text-xs font-bold uppercase tracking-widest">{formatFetchDate(heroCompany.created_at)}</span>
                                 </div>
                                 <h3 className="text-6xl lg:text-[5.5rem] font-black text-black tracking-tighter leading-[0.9] mb-4 group-hover:text-[#00e659] transition-colors">{heroCompany.ticker}</h3>
                                 <p className="text-xl text-gray-500 font-light max-w-xl line-clamp-2">Comprehensive strategic analysis breaking down management guidance, future capex plans, and margin expansion triggers entirely.</p>
@@ -196,7 +178,7 @@ export default function HomePage() {
                                     ticker={company.ticker}
                                     companyName={company.name}
                                     category="Archive"
-                                    date={getQuarterDate(company.quarter, index + 3)}
+                                    date={formatFetchDate(company.created_at)}
                                 />
                             ))}
                         </div>

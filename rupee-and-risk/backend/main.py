@@ -77,6 +77,7 @@ def get_all_companies(user: User = Depends(get_pro_user)):
                 "quarter": c.quarter,
                 "summary": c.summary or "",
                 "growth_triggers": growth_text,
+                "created_at": c.created_at.isoformat() if c.created_at else None,
             })
         return result
 
@@ -94,6 +95,7 @@ def get_public_companies():
                 "quarter": c.quarter,
                 "summary": "Subscribe to Rupee And Risk PRO to unlock full institutional summaries and deep dive analysis.",
                 "growth_triggers": "PRO ACCESS REQUIRED",
+                "created_at": c.created_at.isoformat() if c.created_at else None,
             })
         return result
 
