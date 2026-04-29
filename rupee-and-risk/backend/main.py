@@ -1,4 +1,5 @@
-from fastapi import FastAPI, HTTPException, Depends, Header, BackgroundTasks
+from fastapi import FastAPI, HTTPException, Depends, Header, BackgroundTasks, Request
+from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 import asyncio
 from fastapi.middleware.cors import CORSMiddleware
@@ -25,16 +26,9 @@ async def lifespan(application: FastAPI):
     yield
 
 app = FastAPI(title="RupeeAndRisk.ai API", lifespan=lifespan)
-app.include_router(auth_router)
-app.include_router(payment_router)
 
-@app.get("/")
-def health_check():
-    return {"status": "alive", "message": "Rupee and Risk API is operational."}
-
-class ChatRequest(BaseModel):
-    question: str
-
+# CORS middleware MUST be added before routes/routers so that
+# error responses (500, etc.) also include the CORS headers.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -47,6 +41,25 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Catch-all exception handler to ensure unhandled errors still return
+# a proper JSON response (CORS middleware will then add its headers).
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=500,
+        content={"detail": f"Internal server error: {str(exc)}"},
+    )
+
+app.include_router(auth_router)
+app.include_router(payment_router)
+
+@app.get("/")
+def health_check():
+    return {"status": "alive", "message": "Rupee and Risk API is operational."}
+
+class ChatRequest(BaseModel):
+    question: str
 
 @app.post("/api/scheduler/force-fetch")
 def force_fetch_webhook(background_tasks: BackgroundTasks, webhook_token: str = Header(None)):

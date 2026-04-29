@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import ArticleCard from '../components/ArticleCard';
+import { fetchWithRetry } from '../utils/api';
 
 export default function DeepDivesPage() {
     const [companies, setCompanies] = useState([]);
@@ -28,7 +28,7 @@ export default function DeepDivesPage() {
 
     useEffect(() => {
         window.scrollTo(0, 0);
-        axios.get(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/companies/public`)
+        fetchWithRetry('/api/companies/public')
             .then(response => {
                 setCompanies(response.data);
                 setLoading(false);

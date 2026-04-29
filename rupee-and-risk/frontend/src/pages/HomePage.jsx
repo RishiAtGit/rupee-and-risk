@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Activity, Zap, TrendingUp, BarChart3, ChevronRight } from 'lucide-react';
 import ArticleCard from '../components/ArticleCard';
+import { fetchWithRetry } from '../utils/api';
 
 export default function HomePage() {
     const [companies, setCompanies] = useState([]);
@@ -16,7 +16,7 @@ export default function HomePage() {
 
     useEffect(() => {
         window.scrollTo(0, 0);
-        axios.get(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/companies/public`)
+        fetchWithRetry('/api/companies/public')
             .then(response => {
                 setCompanies(response.data);
                 setLoading(false);

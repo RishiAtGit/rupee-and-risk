@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
-import axios from 'axios';
 import { Search, ChevronRight } from 'lucide-react';
+import { fetchWithRetry } from '../utils/api';
 
 export default function ArticlePage() {
     const { ticker } = useParams();
@@ -17,7 +17,7 @@ export default function ArticlePage() {
 
     useEffect(() => {
         // Fetch all companies for the sidebar
-        axios.get(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/companies/public`)
+        fetchWithRetry('/api/companies/public')
             .then(response => {
                 setCompanies(response.data);
             })
@@ -33,7 +33,7 @@ export default function ArticlePage() {
             return;
         }
         setLoading(true);
-        axios.get(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/company/public/${companyTicker}`)
+        fetchWithRetry(`/api/company/public/${companyTicker}`)
             .then(response => {
                 setData(response.data);
                 setLoading(false);

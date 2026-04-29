@@ -68,7 +68,9 @@ from sqlmodel import create_engine
 import os
 
 db_url = os.getenv("DATABASE_URL", "sqlite:///rupee_risk.db")
-engine = create_engine(db_url)
+# pool_pre_ping: auto-reconnect stale connections after Render cold starts
+# pool_recycle: prevent the DB server from dropping long-idle connections
+engine = create_engine(db_url, pool_pre_ping=True, pool_recycle=300)
 
 def create_db_and_tables():
     SQLModel.metadata.create_all(engine)
