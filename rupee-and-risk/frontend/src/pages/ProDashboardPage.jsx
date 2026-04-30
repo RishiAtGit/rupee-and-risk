@@ -9,7 +9,8 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
-// API_BASE is imported from utils/apiexport default function ProDashboardPage() {
+// API_BASE is imported from utils/api
+export default function ProDashboardPage() {
     const [companies, setCompanies] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
