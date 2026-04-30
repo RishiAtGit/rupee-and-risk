@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
-import axios from 'axios';
+import api, { fetchWithRetry } from '../utils/api';
 import {
     Database, Search, Filter, ArrowUpDown, Download, Settings, CreditCard,
     LayoutTemplate, LogOut, Code, Activity, TrendingUp, X, ExternalLink,
@@ -9,9 +9,7 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
-const API = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
-
-export default function ProDashboardPage() {
+// API_BASE is imported from utils/apiexport default function ProDashboardPage() {
     const [companies, setCompanies] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
@@ -46,7 +44,7 @@ export default function ProDashboardPage() {
         window.scrollTo(0, 0);
         if (!token) return;
         
-        axios.get(`${API}/api/companies`, {
+        fetchWithRetry('/api/companies', {
             headers: { Authorization: `Bearer ${token}` }
         })
             .then(res => { setCompanies(res.data); setLoading(false); })
@@ -146,7 +144,7 @@ export default function ProDashboardPage() {
         setChatInput('');
         setChatLoading(true);
         try {
-            const res = await axios.post(`${API}/api/chat/${selectedCompany.ticker}`, 
+            const res = await api.post(`/api/chat/${selectedCompany.ticker}`, 
                 { question: chatInput },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
