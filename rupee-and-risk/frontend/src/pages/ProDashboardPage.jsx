@@ -162,7 +162,7 @@ export default function ProDashboardPage() {
         setIsSidebarOpen(false); // Collapse sidebar immediately for larger view
         setTranscriptLoading(true);
         try {
-            const res = await axios.get(`${API}/api/company/${selectedCompany.ticker}`, {
+            const res = await fetchWithRetry(`/api/company/${selectedCompany.ticker}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setTranscriptData(res.data);
