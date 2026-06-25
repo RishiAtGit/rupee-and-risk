@@ -212,7 +212,7 @@ Answer the user's question clearly, concisely, and professionally. Reference spe
 """
         try:
             response = client.models.generate_content(
-                model="gemini-flash-latest",
+                model="gemini-2.5-flash",
                 contents=f"{context}\n\nUSER QUESTION: {body.question}"
             )
             return {"answer": response.text}

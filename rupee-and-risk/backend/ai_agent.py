@@ -56,15 +56,15 @@ def analyze_earnings_call(text_content: str):
     for attempt in range(max_retries):
         try:
             response = client.models.generate_content(
-                model='gemini-flash-latest', 
+                model='gemini-2.5-flash', 
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     response_mime_type='application/json'
                 )
             )
             
-            # --- THE FIX: Clean the response text before parsing ---
-            raw_text = response.text.strip()
+            # --- THE FIX: Clean the response text safely before parsing ---
+            raw_text = response.text.strip() if response.text else ""
             if raw_text.startswith("```json"):
                 raw_text = raw_text[7:-3].strip()
             elif raw_text.startswith("```"):

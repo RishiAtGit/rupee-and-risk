@@ -23,9 +23,25 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
         detail="Invalid or expired authentication token.",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    
+    firebase_app = get_firebase_app()
     try:
-        decoded = firebase_auth.verify_id_token(token)
-        firebase_uid = decoded.get("uid")
+        if firebase_app is not None:
+            decoded = firebase_auth.verify_id_token(token)
+            firebase_uid = decoded.get("uid")
+        else:
+            # Fallback decoding without verification for local development
+            import base64
+            import json
+            parts = token.split('.')
+            if len(parts) == 3:
+                payload = parts[1]
+                payload += '=' * (4 - len(payload) % 4)
+                decoded = json.loads(base64.urlsafe_b64decode(payload).decode('utf-8'))
+                firebase_uid = decoded.get("user_id") or decoded.get("uid")
+            else:
+                raise credentials_exception
+        
         email = decoded.get("email")
         if not firebase_uid:
             raise credentials_exception
@@ -51,8 +67,15 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
                 email=email or "",
                 firebase_uid=firebase_uid,
                 full_name=name,
-                is_pro_member=False
+                is_pro_member=True if firebase_app is None else False
             )
+            session.add(user)
+            session.commit()
+            session.refresh(user)
+            
+        # Auto-upgrade to PRO in local dev if they already exist but aren't PRO
+        if user and firebase_app is None and not user.is_pro_member:
+            user.is_pro_member = True
             session.add(user)
             session.commit()
             session.refresh(user)

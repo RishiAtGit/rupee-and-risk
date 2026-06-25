@@ -21,10 +21,10 @@ def get_firebase_app():
             cred_dict = json.loads(service_account_json)
             cred = credentials.Certificate(cred_dict)
             _app = firebase_admin.initialize_app(cred)
-            print("✅ Firebase Admin SDK initialized successfully.")
+            print("[SUCCESS] Firebase Admin SDK initialized successfully.")
         except Exception as e:
-            print(f"❌ Firebase Admin SDK initialization failed: {e}")
+            print(f"[ERROR] Firebase Admin SDK initialization failed: {e}")
     else:
-        print("⚠️ FIREBASE_SERVICE_ACCOUNT_JSON not set — Firebase auth will not work.")
+        print("[WARNING] FIREBASE_SERVICE_ACCOUNT_JSON not set — Firebase auth will not work.")
     
     return _app
